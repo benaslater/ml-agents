@@ -46,24 +46,23 @@ setup(
         "Intended Audience :: Developers",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
         "License :: OSI Approved :: Apache Software License",
-        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.14",
     ],
     packages=find_packages(
         exclude=["*.tests", "*.tests.*", "tests.*", "tests", "colabs", "*.ipynb"]
     ),
     zip_safe=False,
     install_requires=[
-        "cloudpickle",
-        "grpcio>=1.11.0,<=1.53.2",
-        "Pillow>=4.2.1",
-        "protobuf>=3.6,<3.21",
-        "pyyaml>=3.1.0",
-        "gym>=0.21.0",
-        "pettingzoo==1.15.0",
-        "numpy>=1.23.5,<1.24.0",
-        "filelock>=3.4.0",
+        "grpcio",
+        "Pillow",
+        "protobuf",
+        "numpy",
+        "packaging",
     ],
-    python_requires=">=3.10.1,<=3.10.12",
+    extras_require={
+        "test": ["filelock", "pytest"],
+    },
+    python_requires=">=3.14",
     # TODO: Remove this once mypy stops having spurious setuptools issues.
     cmdclass={"verify": VerifyVersionCommand},  # type: ignore
 )
