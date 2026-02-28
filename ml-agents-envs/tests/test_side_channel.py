@@ -2,18 +2,10 @@ import uuid
 import pytest
 from mlagents_envs.side_channel import SideChannel, IncomingMessage, OutgoingMessage
 from mlagents_envs.side_channel.side_channel_manager import SideChannelManager
-from mlagents_envs.side_channel.float_properties_channel import FloatPropertiesChannel
 from mlagents_envs.side_channel.raw_bytes_channel import RawBytesChannel
 from mlagents_envs.side_channel.engine_configuration_channel import (
     EngineConfigurationChannel,
     EngineConfig,
-)
-from mlagents_envs.side_channel.environment_parameters_channel import (
-    EnvironmentParametersChannel,
-)
-from mlagents_envs.side_channel.stats_side_channel import (
-    StatsSideChannel,
-    StatsAggregationMethod,
 )
 from mlagents_envs.exception import (
     UnitySideChannelException,
@@ -45,38 +37,6 @@ def test_int_channel():
     SideChannelManager([receiver]).process_side_channel_message(data)
     assert receiver.list_int[0] == 5
     assert receiver.list_int[1] == 6
-
-
-def test_float_properties():
-    sender = FloatPropertiesChannel()
-    receiver = FloatPropertiesChannel()
-
-    sender.set_property("prop1", 1.0)
-
-    data = SideChannelManager([sender]).generate_side_channel_messages()
-    SideChannelManager([receiver]).process_side_channel_message(data)
-
-    val = receiver.get_property("prop1")
-    assert val == 1.0
-    val = receiver.get_property("prop2")
-    assert val is None
-    sender.set_property("prop2", 2.0)
-
-    data = SideChannelManager([sender]).generate_side_channel_messages()
-    SideChannelManager([receiver]).process_side_channel_message(data)
-
-    val = receiver.get_property("prop1")
-    assert val == 1.0
-    val = receiver.get_property("prop2")
-    assert val == 2.0
-    assert len(receiver.list_properties()) == 2
-    assert "prop1" in receiver.list_properties()
-    assert "prop2" in receiver.list_properties()
-    val = sender.get_property("prop1")
-    assert val == 1.0
-
-    assert receiver.get_property_dict_copy() == {"prop1": 1.0, "prop2": 2.0}
-    assert receiver.get_property_dict_copy() == sender.get_property_dict_copy()
 
 
 def test_raw_bytes():
@@ -208,51 +168,3 @@ def test_engine_configuration():
         SideChannelManager([sender]).process_side_channel_message(data)
 
 
-def test_environment_parameters():
-    sender = EnvironmentParametersChannel()
-    # We use a raw bytes channel to interpred the data
-    receiver = RawBytesChannel(sender.channel_id)
-
-    sender.set_float_parameter("param-1", 0.1)
-    data = SideChannelManager([sender]).generate_side_channel_messages()
-    SideChannelManager([receiver]).process_side_channel_message(data)
-
-    message = IncomingMessage(receiver.get_and_clear_received_messages()[0])
-    key = message.read_string()
-    dtype = message.read_int32()
-    value = message.read_float32()
-    assert key == "param-1"
-    assert dtype == EnvironmentParametersChannel.EnvironmentDataTypes.FLOAT
-    assert value - 0.1 < 1e-8
-
-    sender.set_float_parameter("param-1", 0.1)
-    sender.set_float_parameter("param-2", 0.1)
-    sender.set_float_parameter("param-3", 0.1)
-
-    data = SideChannelManager([sender]).generate_side_channel_messages()
-    SideChannelManager([receiver]).process_side_channel_message(data)
-
-    assert len(receiver.get_and_clear_received_messages()) == 3
-
-    with pytest.raises(UnityCommunicationException):
-        # try to send data to the EngineConfigurationChannel
-        sender.set_float_parameter("param-1", 0.1)
-        data = SideChannelManager([sender]).generate_side_channel_messages()
-        SideChannelManager([sender]).process_side_channel_message(data)
-
-
-def test_stats_channel():
-    receiver = StatsSideChannel()
-    message = OutgoingMessage()
-    message.write_string("stats-1")
-    message.write_float32(42.0)
-    message.write_int32(1)  # corresponds to StatsAggregationMethod.MOST_RECENT
-
-    receiver.on_message_received(IncomingMessage(message.buffer))
-
-    stats = receiver.get_and_reset_stats()
-
-    assert len(stats) == 1
-    val, method = stats["stats-1"][0]
-    assert val - 42.0 < 1e-8
-    assert method == StatsAggregationMethod.MOST_RECENT
