@@ -1,4 +1,6 @@
-# Unity ML-Agents Python Interface
+# Unity ML-Agents Python Interface - Animal AI Fork
+
+This is a fork of the ML-Agents Python package maintained by the Kinds of Intelligence team at [Leverhulme Centre for the Future of Intelligence](https://www.lcfi.ac.uk/) to support the [Animal-AI environment](https://github.com/Kinds-of-Intelligence-CFI/animal-ai). 
 
 The `mlagents_envs` Python package is part of the
 [ML-Agents Toolkit](https://github.com/Unity-Technologies/ml-agents).
