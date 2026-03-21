@@ -34,7 +34,7 @@ with open(os.path.join(here, "README.md"), encoding="utf-8") as f:
     long_description = f.read()
 
 setup(
-    name="mlagents_envs",
+    name="mlagents-envs-aai",
     version=VERSION,
     description="Unity Machine Learning Agents Interface",
     long_description=long_description,
@@ -42,10 +42,10 @@ setup(
     url="https://github.com/Unity-Technologies/ml-agents",
     author="Unity Technologies",
     author_email="ML-Agents@unity3d.com",
+    license="Apache-2.0",
     classifiers=[
         "Intended Audience :: Developers",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
-        "License :: OSI Approved :: Apache Software License",
         "Programming Language :: Python :: 3.14",
     ],
     packages=find_packages(
