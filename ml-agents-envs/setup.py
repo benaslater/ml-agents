@@ -55,7 +55,7 @@ setup(
     install_requires=[
         "grpcio",
         "Pillow",
-        "protobuf",
+        "protobuf>=6.31.1",
         "numpy",
         "packaging",
     ],
