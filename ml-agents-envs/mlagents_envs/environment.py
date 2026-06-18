@@ -269,7 +269,7 @@ class UnityEnvironment(BaseEnv):
     def _executable_args(self) -> List[str]:
         args: List[str] = []
         if self._no_graphics:
-            args += ["-nographics", "-batchmode"]
+            args += ["-batchmode"]
         args += [UnityEnvironment._PORT_COMMAND_LINE_ARG, str(self._port)]
 
         # If the logfile arg isn't already set in the env args,
